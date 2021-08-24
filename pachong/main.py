@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import requests
 import tushare as ts
 import pandas as pd
@@ -28,9 +30,20 @@ def get_stock_all():
     data.to_csv(stock_list_path, encoding=csv_encoding, index=False)
 
 
-# 获取所有的股票历史数据
+# 将tushare的股票代码转换成网易的股票代码
+def convert_tushare_code_to_wangyi_code(tushare_code: str) -> str:
+    exchange = tushare_code[7:9]
+    if exchange == 'SH':
+        return '0' + tushare_code[0:6]
+    elif exchange == 'SZ':
+        return '1' + tushare_code[0:6]
+
+
+# 获取所有的股票历史数据 tushare和网易交易所对应 SZ:1 SH:0
 def get_all_stocks_history():
-    print(1)
+    stocks: DataFrame = pd.read_csv(stock_list_path, encoding='GBK')
+    for code in stocks['ts_code']:
+        get_stock_history(convert_tushare_code_to_wangyi_code(code), '19890101', datetime.now().strftime('%Y%m%d'))
 
 
 # 获取单个股票历史数据
