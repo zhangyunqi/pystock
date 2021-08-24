@@ -29,13 +29,12 @@ def get_stock_all():
 
 
 # 获取所有的股票历史数据
-
 def get_all_stocks_history():
     print(1)
 
 
 # 获取单个股票历史数据
-def get_stock_history(stock_code: str, start_date: str, end_date: str, file_name=None, down_res=None):
+def get_stock_history(stock_code: str, start_date: str, end_date: str):
     url = wangyi_stock_url.format(stock_code, start_date, end_date)
     data = requests.get(url)
     with open(stock_file_path + stock_code + ".csv", "wb") as stream:
