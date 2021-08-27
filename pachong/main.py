@@ -1,4 +1,5 @@
 import math
+import time
 from datetime import datetime
 
 import requests
@@ -71,14 +72,25 @@ def get_stock_factor(stock_code: str) -> DataFrame:
             start_date: str = (
                 stock_datas.iloc[len(stock_datas) - 1]["日期"] if (((n + 1) * 3000 - 1) >= len(stock_datas)) else
                 stock_datas.iloc[(n + 1) * 3000 - 1]["日期"])
-            print(start_date.replace("-", ""))
-            print(end_date.replace("-", ""))
             df = pro.adj_factor(ts_code=stock_code, start_date=start_date.replace("-", ""),
                                 end_date=end_date.replace("-", ""))
             if n == 0:
                 all_data = df
             else:
                 all_data = pd.concat([all_data, df], axis=0)
-                print(len(all_data))
 
     all_data.to_csv(stock_factor_file_path.format(wangyi_stock_code), encoding="GBK")
+
+
+# 提取所有股票的历史复权因子
+def get_all_stock_factor():
+    i = 1
+    stocks: DataFrame = pd.read_csv(stock_list_path, encoding='GBK')
+    for code in stocks['ts_code']:
+        get_stock_factor(code)
+        i = i+1
+        print(i)
+        if 0 == (i % 100):
+            print("暂停")
+            # 每166次暂停一分钟，因为接口一分钟只能500次
+            time.sleep(60)
