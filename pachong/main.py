@@ -66,12 +66,19 @@ def get_stock_factor(stock_code: str) -> DataFrame:
         df = pro.adj_factor(ts_code=stock_code, trade_date='')
         all_data = df
     else:
-        for n in range(0, math.ceil(3000)):
-            start_date = stock_datas[n * 3000]
-            end_date = (stock_datas[len(stock_datas)]["日期"] if (((n + 1) * 3000 - 1) > len(stock_datas)) else
-                        stock_datas[(n + 1) * 3000 - 1]["日期"])
-            df = pro.adj_factor(ts_code=stock_code, start_date=datetime.strftime(start_date, '%Y%m%d'),
-                                end_date=datetime.strftime(end_date, '%Y%m%d'))
-            all_data = pd.concat([all_data, df], axis=0)
+        for n in range(0, math.ceil(len(stock_datas) / 3000)):
+            end_date: str = stock_datas.iloc[n * 3000]["日期"]
+            start_date: str = (
+                stock_datas.iloc[len(stock_datas) - 1]["日期"] if (((n + 1) * 3000 - 1) >= len(stock_datas)) else
+                stock_datas.iloc[(n + 1) * 3000 - 1]["日期"])
+            print(start_date.replace("-", ""))
+            print(end_date.replace("-", ""))
+            df = pro.adj_factor(ts_code=stock_code, start_date=start_date.replace("-", ""),
+                                end_date=end_date.replace("-", ""))
+            if n == 0:
+                all_data = df
+            else:
+                all_data = pd.concat([all_data, df], axis=0)
+                print(len(all_data))
 
     all_data.to_csv(stock_factor_file_path.format(wangyi_stock_code), encoding="GBK")
