@@ -88,9 +88,28 @@ def get_all_stock_factor():
     stocks: DataFrame = pd.read_csv(stock_list_path, encoding='GBK')
     for code in stocks['ts_code']:
         get_stock_factor(code)
-        i = i+1
+        i = i + 1
         print(i)
         if 0 == (i % 100):
             print("暂停")
             # 每166次暂停一分钟，因为接口一分钟只能500次
             time.sleep(60)
+
+
+# 计算前复权价格
+def calculate_fqq(wangyi_stock_code: str):
+    stock_datas = pd.read_csv(stock_file_path.format(wangyi_stock_code), encoding="GBK", index_col='日期')
+    stock_factors = pd.read_csv(stock_factor_file_path.format(wangyi_stock_code), encoding="GBK")
+    for row in stock_datas.itertuples():
+        print(row.Index)
+        stock_datas.index = float(row.收盘价) * 1.5
+    print(stock_datas)
+
+
+# 计算后复权价格
+def calculate_fqh(stock_code: str):
+    stock_datas = pd.read_csv(stock_file_path.format(wangyi_stock_code), encoding="GBK")
+    for stock_data in stock_datas:
+        stock_data["收盘价"] = stock_data["收盘价"] * 1.5
+
+    print(stock_datas)
