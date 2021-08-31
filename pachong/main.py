@@ -99,10 +99,21 @@ def get_all_stock_factor():
 # 计算前复权价格
 def calculate_fqq(wangyi_stock_code: str):
     stock_datas = pd.read_csv(stock_file_path.format(wangyi_stock_code), encoding="GBK", index_col='日期')
-    stock_factors = pd.read_csv(stock_factor_file_path.format(wangyi_stock_code), encoding="GBK")
+    stock_factors = pd.read_csv(stock_factor_file_path.format(wangyi_stock_code), encoding="GBK",
+                                index_col='trade_date')
+    qfq = []
+    hfq = []
+
+    new_factor = stock_factors.iloc[0]['adj_factor']
     for row in stock_datas.itertuples():
-        print(row.Index)
-        stock_datas.index = float(row.收盘价) * 1.5
+        factor_index = int(str.replace(row.Index, '-', ''))
+        factor = stock_factors.loc[factor_index]['adj_factor']
+        factor = 1 if factor is None else factor
+        # print(float(row.收盘价) * factor)
+        hfq.append(float(row.收盘价) * factor)
+        qfq.append(float(row.收盘价) * factor / new_factor)
+    stock_datas['后复权'] = hfq
+    stock_datas['前复权'] = qfq
     print(stock_datas)
 
 
