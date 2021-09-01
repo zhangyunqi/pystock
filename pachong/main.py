@@ -116,11 +116,3 @@ def calculate_fqq(wangyi_stock_code: str):
     stock_datas['前复权'] = qfq
     print(stock_datas)
 
-
-# 计算后复权价格
-def calculate_fqh(stock_code: str):
-    stock_datas = pd.read_csv(stock_file_path.format(wangyi_stock_code), encoding="GBK")
-    for stock_data in stock_datas:
-        stock_data["收盘价"] = stock_data["收盘价"] * 1.5
-
-    print(stock_datas)
