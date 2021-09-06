@@ -1,11 +1,11 @@
 import math
 import time
-from datetime import datetime
 
 import requests
 import tushare as ts
 import pandas as pd
 from pandas import DataFrame
+from stockstats import StockDataFrame
 
 # 设置tushare的token
 ts.set_token("8e3c6429eaa36d0e2b6346489f769d0d459d1f03588c3cc77fd79f58")
@@ -116,3 +116,31 @@ def calculate_fqq(wangyi_stock_code: str):
     stock_datas['前复权'] = qfq
     print(stock_datas)
 
+
+# 计算指标
+def calculate_zhibiao(wangyi_stock_code: str):
+    data: pd.DataFrame = pd.read_csv("C:/Users/zhangyunqi/PycharmProjects/pystock/data/stock/0600000.csv"
+                                     , encoding="GBK"
+                                     , usecols=["日期", "收盘价", "最高价", "最低价", "开盘价", "成交量"])
+    # 过滤停牌的交易日，条件"收盘价","最高价","最低价","开盘价","成交量"均为0
+    data = data[(data["收盘价"] != 0) & (data["最高价"] != 0)
+                & (data["最低价"] != 0) & (data["开盘价"] != 0)
+                & (data["成交量"] != 0)]
+    # 修改列
+    data.rename(columns={'日期': 'date', '收盘价': 'close', '最高价': 'high', '最低价': 'low', '开盘价': 'open', '成交量': 'volume'}
+                , inplace=True)
+    # 将数据倒序输出
+    data = data.reindex(index=data.index[::-1])
+    stock = StockDataFrame.retype(data)
+    # sma
+
+    # ema
+
+    # boll:boll-中线  boll_ub:boll-up上线  boll_lb: boll下线
+    stock['boll'], stock['boll_ub'], stock['boll_lb']
+    # macd:DIF macds:DEA macdh*2:MACD
+    stock['macd'], stock['macds'], stock['macdh']
+    # kdj
+    stock['kdjk'], stock['kdjd'], stock['kdjj']
+    # rsi
+    stock['rsi_6'],stock['rsi_12'],stock['rsi_24']
