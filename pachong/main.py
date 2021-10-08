@@ -118,35 +118,7 @@ def calculate_fqq(wangyi_stock_code: str):
 
 
 # 计算指标
-def calculate_zhibiao(wangyi_stock_code: str):
-    data: pd.DataFrame = pd.read_csv("C:/Users/zhangyunqi/PycharmProjects/pystock/data/stock/0600000.csv"
-                                     , encoding="GBK"
-                                     , usecols=["日期", "收盘价", "最高价", "最低价", "开盘价", "成交量"])
-    # 过滤停牌的交易日，条件"收盘价","最高价","最低价","开盘价","成交量"均为0
-    data = data[(data["收盘价"] != 0) & (data["最高价"] != 0)
-                & (data["最低价"] != 0) & (data["开盘价"] != 0)
-                & (data["成交量"] != 0)]
-    # 修改列
-    data.rename(columns={'日期': 'date', '收盘价': 'close', '最高价': 'high', '最低价': 'low', '开盘价': 'open', '成交量': 'volume'}
-                , inplace=True)
-    # 将数据倒序输出
-    data = data.reindex(index=data.index[::-1])
-    stock = StockDataFrame.retype(data)
-    # sma
-    stock['close_5_sma'], stock['close_10_sma'], stock['close_30_sma'], stock['close_60_sma']
-    # ema
-    # boll:boll-中线  boll_ub:boll-up上线  boll_lb: boll下线
-    stock['boll'], stock['boll_ub'], stock['boll_lb']
-    # macd:DIF macds:DEA macdh*2:MACD
-    stock['macd'], stock['macds'], stock['macdh']
-    # kdj
-    stock['kdjk'], stock['kdjd'], stock['kdjj']
-    # rsi
-    stock['rsi_6'], stock['rsi_12'], stock['rsi_24']
-
-
-# 计算指标
-def calculate_zhibiao1(wangyi_stock_code: str, fq_flag: int):
+def calculate_zhibiao(wangyi_stock_code: str, fq_flag: int):
     # 股票数据
     stock_datas: pd.DataFrame = pd.read_csv(stock_file_path.format(wangyi_stock_code)
                                             , encoding="GBK")
@@ -198,8 +170,8 @@ def calculate_zhibiao1(wangyi_stock_code: str, fq_flag: int):
                               & (stock_datas["成交量"] != 0)]
     # 修改列
     stock_datas.rename(
-        columns={'日期': 'date', '收盘价': 'close', '最高价': 'high', '最低价': 'low', '开盘价': 'open', '成交量': 'volume'}
-        , inplace=True)
+        columns={'日期': 'date', '收盘价': 'close', '最高价': 'high', '最低价': 'low', '开盘价': 'open', '成交量': 'volume',
+                 '换手率': 'tor', '涨跌额': 'chgamt', '涨跌幅': 'chg'}, inplace=True)
     # 将数据倒序输出
     stock_datas = stock_datas.reindex(index=stock_datas.index[::-1])
     stock = StockDataFrame.retype(stock_datas)
@@ -215,4 +187,6 @@ def calculate_zhibiao1(wangyi_stock_code: str, fq_flag: int):
     # rsi
     stock['rsi_6'], stock['rsi_12'], stock['rsi_24']
 
-    stock.to_csv("D:\\1111.csv", encoding="GBK")
+    stock.reset_index(level=None, drop=False, inplace=True, col_level=0, col_fill='')
+
+    return stock
